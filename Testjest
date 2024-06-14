@@ -1,0 +1,35 @@
+const fs = require('fs');
+const path = require('path');
+
+// Directory where source files are located
+const sourceDir = './src';
+
+// Directory where test files will be created
+const testDir = './__tests__';
+
+// Ensure the test directory exists
+if (!fs.existsSync(testDir)) {
+  fs.mkdirSync(testDir);
+}
+
+// Read source directory
+fs.readdirSync(sourceDir).forEach(file => {
+  const basename = path.basename(file, path.extname(file));
+  const testFileName = `${basename}.test.js`;
+  const testFilePath = path.join(testDir, testFileName);
+
+  // Skip if the test file already exists
+  if (fs.existsSync(testFilePath)) return;
+
+  // Basic test template
+  const testContent = `const ${basename} = require('../${sourceDir}/${basename}');
+
+test('${basename} test', () => {
+  // Add your test cases here
+  expect(${basename}()).toBe(/* expected result */);
+});
+`;
+
+  // Write test file
+  fs.writeFileSync(testFilePath, testContent);
+});
